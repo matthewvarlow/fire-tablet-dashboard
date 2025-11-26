@@ -111,12 +111,36 @@ export default function Dashboard() {
     }
   };
 
-  // Check time and update night mode (after 11 PM)
+  // Check time and update night mode (11 PM to sunrise)
   useEffect(() => {
     const checkNightMode = () => {
       const now = new Date();
       const hour = now.getHours();
-      setIsNightMode(hour >= 23 || hour < 6); // 11 PM to 6 AM
+      const minutes = now.getMinutes();
+      const currentTimeMinutes = hour * 60 + minutes;
+
+      // Get sunrise time from weather data if available
+      let sunriseHour = 6; // Default fallback
+      let sunriseMinutes = 0;
+
+      if (weatherData?.current?.nextSunEvent?.type === 'sunrise') {
+        // Parse sunrise time (e.g., "7:30 AM")
+        const sunriseStr = weatherData.current.nextSunEvent.time;
+        const match = sunriseStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+        if (match) {
+          sunriseHour = parseInt(match[1]);
+          sunriseMinutes = parseInt(match[2]);
+          if (match[3] === 'PM' && sunriseHour !== 12) sunriseHour += 12;
+          if (match[3] === 'AM' && sunriseHour === 12) sunriseHour = 0;
+        }
+      }
+
+      const sunriseTimeMinutes = sunriseHour * 60 + sunriseMinutes;
+      const nightStartMinutes = 23 * 60; // 11 PM
+
+      // Night mode: 11 PM to sunrise
+      const isNight = currentTimeMinutes >= nightStartMinutes || currentTimeMinutes < sunriseTimeMinutes;
+      setIsNightMode(isNight);
     };
 
     // Check immediately
@@ -126,7 +150,7 @@ export default function Dashboard() {
     const interval = setInterval(checkNightMode, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [weatherData]);
 
   useEffect(() => {
     fetchWeather();
