@@ -76,8 +76,8 @@ A Next.js dashboard with an iOS-inspired dark mode design, optimized for Fire Ta
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/matthewvarlow/E-Ink-Weather-Calendar-Dashboard.git
-cd E-Ink-Weather-Calendar-Dashboard
+git clone https://github.com/matthewvarlow/fire-tablet-dashboard.git
+cd fire-tablet-dashboard
 ```
 
 2. Install dependencies:
