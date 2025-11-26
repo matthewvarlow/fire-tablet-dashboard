@@ -158,6 +158,10 @@ body {
   --accent-yellow: #cc0000;
   --accent-orange: #cc0000;
   --accent-purple: #cc0000;
+
+  /* Darken cards to nearly match background */
+  --bg-card: rgba(28, 28, 30, 0.3);
+  --bg-card-elevated: rgba(28, 28, 30, 0.4);
 }
 
 .night-mode * {
