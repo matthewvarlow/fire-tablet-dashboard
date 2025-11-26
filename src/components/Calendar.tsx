@@ -200,10 +200,15 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   const today = startOfDay(currentTime);
   const tomorrow = addDays(today, 1);
 
-  // Get today's timed events
+  // Get today's events
   const todayTimedEvents = data.events.filter(event => {
     const eventStart = parseISO(event.start);
     return isSameDay(eventStart, today) && !event.allDay;
+  });
+
+  const todayAllDayEvents = data.events.filter(event => {
+    const eventStart = parseISO(event.start);
+    return isSameDay(eventStart, today) && event.allDay;
   });
 
   // Get tomorrow's events - all day events + longest event per calendar
@@ -249,28 +254,15 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   // Get tomorrow's timed events for schedule view
   const tomorrowTimedEvents = tomorrowEvents.filter(event => !event.allDay);
+  const tomorrowAllDayEvents = tomorrowEvents.filter(event => event.allDay);
 
   // Determine which events to show in schedule based on toggle
   const scheduleEvents = showTomorrow ? tomorrowTimedEvents : todayTimedEvents;
+  const allDayEvents = showTomorrow ? tomorrowAllDayEvents : todayAllDayEvents;
 
-  let earliestHour = 9;
-  let latestHour = 17;
-
-  scheduleEvents.forEach(event => {
-    const eventStart = parseISO(event.start);
-    const eventEnd = parseISO(event.end);
-    earliestHour = Math.min(earliestHour, eventStart.getHours());
-    latestHour = Math.max(latestHour, eventEnd.getHours() + (eventEnd.getMinutes() > 0 ? 1 : 0));
-  });
-
-  // Extend latestHour to at least the current hour + 1 to always show the red line (only for today)
-  if (!showTomorrow) {
-    const currentHour = currentTime.getHours();
-    latestHour = Math.max(latestHour, currentHour + 1);
-  }
-
-  earliestHour = Math.max(0, earliestHour);
-  latestHour = Math.min(24, latestHour);
+  // Always show full 24-hour day (12am to 11:59pm)
+  const earliestHour = 0;
+  const latestHour = 24;
   const hours = Array.from({ length: latestHour - earliestHour }, (_, i) => i + earliestHour);
 
   const getEventsForSchedule = (): PositionedEvent[] => {
@@ -348,21 +340,47 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   return (
     <div className="h-full flex flex-col gap-4">
       {/* Today's Schedule - should align bottom with Current Weather card */}
-      <div className="card card-elevated p-6" style={{ height: '520px' }}>
+      <div className="card card-elevated p-6 flex flex-col" style={{ height: '520px' }}>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-quaternary mb-5 ml-1">
           {showTomorrow ? "Tomorrow's Schedule" : "Today's Schedule"}
         </h3>
+
+        {/* All-Day Events - Fixed Header */}
+        {allDayEvents.length > 0 && (
+          <div className="mb-3 pb-3" style={{ borderBottom: '1px solid var(--divider)' }}>
+            <div className="flex flex-col gap-1.5">
+              {allDayEvents.map((event) => {
+                const colors = getEventColor(event);
+                return (
+                  <div
+                    key={event.id}
+                    className="rounded-md px-2.5 py-1.5 flex items-center gap-2"
+                    style={{
+                      backgroundColor: colors.bg,
+                      borderLeft: `3px solid ${colors.border}`,
+                    }}
+                  >
+                    <div className="text-xs font-semibold text-primary truncate flex-1">
+                      {event.title}
+                    </div>
+                    <div className="text-xs font-medium" style={{ color: colors.text }}>
+                      All Day
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div
           ref={scheduleContainerRef}
           onScroll={handleScroll}
-          className="relative h-full schedule-container"
-          style={{ maxHeight: 'calc(100% - 32px)', overflowY: 'auto' }}
+          className="relative flex-1 schedule-container"
+          style={{ overflowY: 'auto' }}
         >
           <div className="relative pr-2">
-            {hours.length === 0 ? (
-              <p className="text-sm text-tertiary">No events scheduled for today</p>
-            ) : (
-              hours.map((hour) => {
+            {hours.map((hour) => {
                 const isCurrentHour = currentTime.getHours() === hour;
                 return (
                   <div
@@ -430,8 +448,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                     </div>
                   </div>
                 );
-              })
-            )}
+              })}
           </div>
 
           {/* Current Time Indicator - only show when viewing today */}
