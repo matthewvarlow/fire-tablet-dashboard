@@ -88,83 +88,61 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
       if (todayEvents.length === 0) return;
 
-      // Calculate earliest and latest hours from events
-      let earliestEventHour = 9;
-      let latestEventHour = 17;
-
-      todayEvents.forEach(event => {
-        const eventStart = parseISO(event.start);
-        const eventEnd = parseISO(event.end);
-        earliestEventHour = Math.min(earliestEventHour, eventStart.getHours());
-        latestEventHour = Math.max(latestEventHour, eventEnd.getHours() + (eventEnd.getMinutes() > 0 ? 1 : 0));
-      });
-
       const now = currentTime;
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
 
-      // Start from 2 hours before current time, but no earlier than 6am
-      // Unless there's an event before that, then show from the earliest event
-      let earliestHour = Math.max(6, currentHour - 2);
-      earliestHour = Math.min(earliestHour, earliestEventHour);
+      // Calculate position from start of day (midnight = hour 0)
+      const minutesSinceMidnight = currentHour * 60 + currentMinute;
+      const position = minutesSinceMidnight * 1.0 + 8; // pixelsPerMinute = 1.0
 
-      // End at least 1 hour after current time, or after the last event ends (whichever is later)
-      let latestHour = Math.max(latestEventHour, currentHour + 1);
+      const containerHeight = scheduleContainerRef.current.clientHeight;
+      const contentHeight = scheduleContainerRef.current.scrollHeight;
 
-      earliestHour = Math.max(0, earliestHour);
-      latestHour = Math.min(24, latestHour);
+      // Find upcoming and current events (not yet finished)
+      const currentTimeMs = now.getTime();
+      const upcomingEvents = todayEvents.filter(event => {
+        const eventEnd = parseISO(event.end);
+        return eventEnd.getTime() > currentTimeMs;
+      });
 
-      if (currentHour >= earliestHour && currentHour < latestHour) {
-        const minutesSinceStart = (currentHour - earliestHour) * 60 + currentMinute;
-        const position = minutesSinceStart * 1.0 + 8; // pixelsPerMinute = 1.0
+      let scrollPosition: number;
 
-        const containerHeight = scheduleContainerRef.current.clientHeight;
-        const contentHeight = scheduleContainerRef.current.scrollHeight;
+      if (upcomingEvents.length === 0) {
+        // No more events - keep red line centered as time continues
+        scrollPosition = Math.max(0, position - containerHeight / 2);
+        // Don't scroll past the end
+        scrollPosition = Math.min(scrollPosition, contentHeight - containerHeight);
+      } else {
+        // Find the bottom position of the last upcoming event
+        const lastUpcomingEvent = upcomingEvents[upcomingEvents.length - 1];
+        const lastEventEnd = parseISO(lastUpcomingEvent.end);
+        const lastEventEndHour = lastEventEnd.getHours();
+        const lastEventEndMinute = lastEventEnd.getMinutes();
+        const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
+        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0 + 8;
 
-        // Find upcoming and current events (not yet finished)
-        const currentTimeMs = now.getTime();
-        const upcomingEvents = todayEvents.filter(event => {
-          const eventEnd = parseISO(event.end);
-          return eventEnd.getTime() > currentTimeMs;
-        });
+        // Try to center on current time
+        scrollPosition = Math.max(0, position - containerHeight / 2);
 
-        let scrollPosition: number;
+        // Check if this would cut off the last upcoming event
+        const visibleBottom = scrollPosition + containerHeight;
 
-        if (upcomingEvents.length === 0) {
-          // No more events - keep red line centered as time continues
-          scrollPosition = Math.max(0, position - containerHeight / 2);
-          // Don't scroll past the end
-          scrollPosition = Math.min(scrollPosition, contentHeight - containerHeight);
-        } else {
-          // Find the bottom position of the last upcoming event
-          const lastUpcomingEvent = upcomingEvents[upcomingEvents.length - 1];
-          const lastEventEnd = parseISO(lastUpcomingEvent.end);
-          const lastEventEndHour = lastEventEnd.getHours();
-          const lastEventEndMinute = lastEventEnd.getMinutes();
-          const lastEventPosition = ((lastEventEndHour - earliestHour) * 60 + lastEventEndMinute) * 1.0 + 8;
-
-          // Try to center on current time
-          scrollPosition = Math.max(0, position - containerHeight / 2);
-
-          // Check if this would cut off the last upcoming event
-          const visibleBottom = scrollPosition + containerHeight;
-
-          // If the last event end is cut off, adjust to show it fully
-          if (lastEventPosition > visibleBottom) {
-            // Prioritize showing the full last event
-            scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60); // +60px padding
-          }
-
-          // But don't scroll so far that we cut off the current time indicator
-          const minScrollToShowRedLine = Math.max(0, position - containerHeight + 100); // Keep red line at least 100px from bottom
-          scrollPosition = Math.min(scrollPosition, minScrollToShowRedLine);
+        // If the last event end is cut off, adjust to show it fully
+        if (lastEventPosition > visibleBottom) {
+          // Prioritize showing the full last event
+          scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60); // +60px padding
         }
 
-        scheduleContainerRef.current.scrollTo({
-          top: scrollPosition,
-          behavior: 'smooth'
-        });
+        // But don't scroll so far that we cut off the current time indicator
+        const minScrollToShowRedLine = Math.max(0, position - containerHeight + 100); // Keep red line at least 100px from bottom
+        scrollPosition = Math.min(scrollPosition, minScrollToShowRedLine);
       }
+
+      scheduleContainerRef.current.scrollTo({
+        top: scrollPosition,
+        behavior: 'smooth'
+      });
     }
   }, [currentTime, isUserScrolling, data, showTomorrow]);
 
@@ -457,35 +435,33 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
 
-            if (currentHour >= earliestHour && currentHour < latestHour) {
-              const minutesSinceStart = (currentHour - earliestHour) * 60 + currentMinute;
-              const position = minutesSinceStart * pixelsPerMinute + 8;
+            // Calculate position from midnight (hour 0)
+            const minutesSinceMidnight = currentHour * 60 + currentMinute;
+            const position = minutesSinceMidnight * pixelsPerMinute + 8;
 
-              return (
+            return (
+              <div
+                className="absolute z-50 pointer-events-none flex items-center"
+                style={{
+                  top: `${position}px`,
+                  left: '4rem',
+                  right: 0,
+                }}
+              >
                 <div
-                  className="absolute z-50 pointer-events-none flex items-center"
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: 'var(--accent-red)' }}
+                />
+                <div
+                  className="flex-1"
                   style={{
-                    top: `${position}px`,
-                    left: '4rem',
-                    right: 0,
+                    height: '2px',
+                    backgroundColor: 'var(--accent-red)',
+                    opacity: 0.7
                   }}
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: 'var(--accent-red)' }}
-                  />
-                  <div
-                    className="flex-1"
-                    style={{
-                      height: '2px',
-                      backgroundColor: 'var(--accent-red)',
-                      opacity: 0.7
-                    }}
-                  />
-                </div>
-              );
-            }
-            return null;
+                />
+              </div>
+            );
           })()}
         </div>
       </div>
