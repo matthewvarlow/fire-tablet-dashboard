@@ -108,7 +108,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
       {/* Clock Card */}
       <div className="card card-elevated p-8" style={{ flexGrow: 1, flexShrink: 1 }}>
         <div className="flex items-center justify-between h-full">
-          <div className="font-extralight tracking-tight text-primary" style={{ fontSize: '11rem', lineHeight: '0.85', letterSpacing: '-0.02em' }}>
+          <div className="font-bold tracking-tight text-primary" style={{ fontSize: '11rem', lineHeight: '0.85', letterSpacing: '-0.02em' }}>
             {format(currentTime, 'h:mm')}
           </div>
           <div className="flex flex-col items-end justify-center">
