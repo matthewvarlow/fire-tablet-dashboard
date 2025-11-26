@@ -72,6 +72,7 @@ export default function Dashboard() {
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [calendarError, setCalendarError] = useState<string | null>(null);
   const [weatherLastRefreshed, setWeatherLastRefreshed] = useState<Date | null>(null);
+  const [isNightMode, setIsNightMode] = useState(false);
 
   const fetchWeather = async () => {
     try {
@@ -109,6 +110,23 @@ export default function Dashboard() {
       setCalendarLoading(false);
     }
   };
+
+  // Check time and update night mode (after 11 PM)
+  useEffect(() => {
+    const checkNightMode = () => {
+      const now = new Date();
+      const hour = now.getHours();
+      setIsNightMode(hour >= 23 || hour < 6); // 11 PM to 6 AM
+    };
+
+    // Check immediately
+    checkNightMode();
+
+    // Check every minute
+    const interval = setInterval(checkNightMode, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetchWeather();
@@ -164,7 +182,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div id="display-container" className="p-5">
+    <div id="display-container" className={`p-5 ${isNightMode ? 'night-mode' : ''}`}>
       <div className="grid grid-cols-[1fr_420px] h-full gap-5">
         {/* Left: Weather */}
         <div className="flex flex-col h-full">

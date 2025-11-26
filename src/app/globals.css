@@ -147,6 +147,33 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Night Mode (after 11 PM) - Red theme */
+.night-mode {
+  --text-primary: #ff6b6b;
+  --text-secondary: #ff8787;
+  --text-tertiary: rgba(255, 107, 107, 0.7);
+  --accent-blue: #ff6b6b;
+  --accent-teal: #ff6b6b;
+  --accent-green: #ff6b6b;
+  --accent-yellow: #ff6b6b;
+  --accent-orange: #ff6b6b;
+  --accent-purple: #ff6b6b;
+}
+
+.night-mode * {
+  color: #ff6b6b !important;
+}
+
+.night-mode svg {
+  fill: #ff6b6b !important;
+  stroke: #ff6b6b !important;
+}
+
+.night-mode path {
+  fill: #ff6b6b !important;
+  stroke: #ff6b6b !important;
+}
+
 /* Hide scrollbar by default for schedule container */
 .schedule-container {
   scrollbar-width: none;
