@@ -120,7 +120,7 @@ export default function Dashboard() {
       const currentTimeMinutes = hour * 60 + minutes;
 
       // Get sunrise time from weather data if available
-      let sunriseHour = 6; // Default fallback
+      let sunriseHour = 7; // Default fallback to 7 AM
       let sunriseMinutes = 0;
 
       if (weatherData?.current?.nextSunEvent?.type === 'sunrise') {
