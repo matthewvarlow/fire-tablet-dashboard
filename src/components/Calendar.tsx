@@ -186,8 +186,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   const todayAllDayEvents = data.events
     .filter(event => {
-      // Handle both date strings (YYYY-MM-DD) and dateTime strings (ISO 8601)
-      const eventStart = new Date(event.start);
+      const eventStart = parseISO(event.start);
       return isSameDay(eventStart, today) && event.allDay;
     })
     .sort((a, b) => {
