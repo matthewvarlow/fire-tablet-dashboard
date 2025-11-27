@@ -94,7 +94,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
       // Calculate position from start of day (midnight = hour 0)
       const minutesSinceMidnight = currentHour * 60 + currentMinute;
-      const position = minutesSinceMidnight * 1.5 + 8; // pixelsPerMinute = 1.5
+      const position = minutesSinceMidnight * 1.0 + 8; // pixelsPerMinute = 1.0
 
       const containerHeight = scheduleContainerRef.current.clientHeight;
       const contentHeight = scheduleContainerRef.current.scrollHeight;
@@ -120,7 +120,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         const lastEventEndHour = lastEventEnd.getHours();
         const lastEventEndMinute = lastEventEnd.getMinutes();
         const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
-        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.5 + 8;
+        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0 + 8;
 
         // Try to center on current time
         scrollPosition = Math.max(0, position - containerHeight / 2);
@@ -185,7 +185,8 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   });
 
   const todayAllDayEvents = data.events.filter(event => {
-    const eventStart = parseISO(event.start);
+    // Handle both date strings (YYYY-MM-DD) and dateTime strings (ISO 8601)
+    const eventStart = new Date(event.start);
     return isSameDay(eventStart, today) && event.allDay;
   });
 
@@ -312,7 +313,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
     return DEFAULT_COLOR;
   };
 
-  const pixelsPerMinute = 1.5;
+  const pixelsPerMinute = 1.0;
   const hourHeight = 60 * pixelsPerMinute;
 
   return (
@@ -398,7 +399,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                           const top = startMinute * pixelsPerMinute;
                           const height = Math.max(duration * pixelsPerMinute - 2, 32);
                           const columnWidth = 100 / event.totalColumns;
-                          const isShortEvent = duration <= 15;
+                          const isShortEvent = duration <= 30;
 
                           return (
                             <div
