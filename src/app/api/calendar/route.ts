@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { startOfWeek, endOfWeek, addWeeks } from 'date-fns';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import ICAL from 'ical.js';
+
+const TIMEZONE = 'America/Toronto'; // EST/EDT
 
 // Function to fetch and parse iCal feed
 async function fetchICalEvents(icalUrl: string, weekStart: Date, weekEnd: Date, calendarIndex: number) {
@@ -18,20 +21,52 @@ async function fetchICalEvents(icalUrl: string, weekStart: Date, weekEnd: Date, 
 
     const events = vevents.map((vevent) => {
       const event = new ICAL.Event(vevent);
-      const startDate = event.startDate.toJSDate();
-      const endDate = event.endDate.toJSDate();
+      const isAllDay = event.startDate.isDate;
 
-      // Filter events within the week range
-      if (endDate < weekStart || startDate > weekEnd) {
-        return null;
+      // For all-day events, use date strings to avoid timezone issues
+      let startStr: string;
+      let endStr: string;
+
+      if (isAllDay) {
+        // Extract YYYY-MM-DD format directly
+        const startYear = event.startDate.year;
+        const startMonth = String(event.startDate.month).padStart(2, '0');
+        const startDay = String(event.startDate.day).padStart(2, '0');
+        startStr = `${startYear}-${startMonth}-${startDay}`;
+
+        const endYear = event.endDate.year;
+        const endMonth = String(event.endDate.month).padStart(2, '0');
+        const endDay = String(event.endDate.day).padStart(2, '0');
+        endStr = `${endYear}-${endMonth}-${endDay}`;
+
+        // Filter using simple date comparison
+        const startDate = new Date(startYear, event.startDate.month - 1, event.startDate.day);
+        const endDate = new Date(endYear, event.endDate.month - 1, event.endDate.day);
+        const weekStartLocal = new Date(weekStart.getTime());
+        const weekEndLocal = new Date(weekEnd.getTime());
+
+        if (endDate < weekStartLocal || startDate > weekEndLocal) {
+          return null;
+        }
+      } else {
+        // For timed events, use ISO strings
+        const startDate = event.startDate.toJSDate();
+        const endDate = event.endDate.toJSDate();
+
+        if (endDate < weekStart || startDate > weekEnd) {
+          return null;
+        }
+
+        startStr = startDate.toISOString();
+        endStr = endDate.toISOString();
       }
 
       return {
         id: event.uid,
         title: event.summary || 'Untitled',
-        start: event.startDate.toJSDate().toISOString(),
-        end: event.endDate.toJSDate().toISOString(),
-        allDay: event.startDate.isDate, // iCal uses isDate for all-day events
+        start: startStr,
+        end: endStr,
+        allDay: isAllDay,
         location: event.location,
         description: event.description,
         colorId: undefined,
@@ -69,10 +104,15 @@ export async function GET() {
 
     const calendar = google.calendar({ version: 'v3', auth });
 
-    // Get events for current week
-    const now = new Date();
-    const weekStart = startOfWeek(now, { weekStartsOn: 0 }); // Sunday
-    const weekEnd = endOfWeek(now, { weekStartsOn: 0 }); // Saturday
+    // Get events for current week in EST timezone
+    const nowUTC = new Date();
+    const nowEST = toZonedTime(nowUTC, TIMEZONE);
+    const weekStartEST = startOfWeek(nowEST, { weekStartsOn: 0 }); // Sunday
+    const weekEndEST = endOfWeek(nowEST, { weekStartsOn: 0 }); // Saturday
+
+    // Convert back to UTC for API calls
+    const weekStart = fromZonedTime(weekStartEST, TIMEZONE);
+    const weekEnd = fromZonedTime(weekEndEST, TIMEZONE);
 
     // Split calendar IDs and fetch events from all calendars
     const calendarIdArray = calendarIds.split(',').map(id => id.trim());

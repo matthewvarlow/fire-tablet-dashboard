@@ -178,16 +178,27 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   const today = startOfDay(currentTime);
   const tomorrow = addDays(today, 1);
 
+  // Helper function to check if event matches a given day
+  const isEventOnDay = (event: CalendarEvent, targetDay: Date): boolean => {
+    if (event.allDay) {
+      // For all-day events, compare date strings (YYYY-MM-DD format)
+      const targetDateStr = format(targetDay, 'yyyy-MM-dd');
+      return event.start === targetDateStr;
+    } else {
+      // For timed events, use normal date comparison
+      const eventStart = parseISO(event.start);
+      return isSameDay(eventStart, targetDay);
+    }
+  };
+
   // Get today's events
   const todayTimedEvents = data.events.filter(event => {
-    const eventStart = parseISO(event.start);
-    return isSameDay(eventStart, today) && !event.allDay;
+    return isEventOnDay(event, today) && !event.allDay;
   });
 
   const todayAllDayEvents = data.events
     .filter(event => {
-      const eventStart = parseISO(event.start);
-      return isSameDay(eventStart, today) && event.allDay;
+      return isEventOnDay(event, today) && event.allDay;
     })
     .sort((a, b) => {
       // Sort by calendarIndex descending (higher index = iCal events, shown first)
@@ -196,10 +207,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   // Get tomorrow's events - all day events + longest event per calendar
   const tomorrowEvents = data.events.filter(event => {
-    // Handle both date strings (YYYY-MM-DD) and dateTime strings (ISO 8601)
-    const eventStart = parseISO(event.start);
-    const isTomorrow = isSameDay(eventStart, tomorrow);
-    return isTomorrow;
+    return isEventOnDay(event, tomorrow);
   });
 
   // Group tomorrow's events by calendar and get all-day + longest per calendar
