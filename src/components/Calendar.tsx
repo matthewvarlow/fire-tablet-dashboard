@@ -326,22 +326,25 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         {/* All-Day Events - Fixed Header */}
         {allDayEvents.length > 0 && (
           <div className="mb-3 pb-3" style={{ borderBottom: '1px solid var(--divider)' }}>
-            <div className="grid grid-cols-3 gap-1.5">
-              {allDayEvents.map((event) => {
+            <div
+              className="grid gap-1.5"
+              style={{ gridTemplateColumns: `repeat(${Math.min(allDayEvents.length, 3)}, 1fr)` }}
+            >
+              {allDayEvents.slice(0, 3).map((event) => {
                 const colors = getEventColor(event);
                 return (
                   <div
                     key={event.id}
-                    className="rounded-md px-2.5 py-1.5 flex items-center gap-2"
+                    className="rounded-md px-2.5 py-1.5 flex flex-col gap-0.5"
                     style={{
                       backgroundColor: colors.bg,
                       borderLeft: `3px solid ${colors.border}`,
                     }}
                   >
-                    <div className="text-xs font-semibold text-primary truncate flex-1">
+                    <div className="text-xs font-semibold text-primary truncate">
                       {event.title}
                     </div>
-                    <div className="text-xs font-medium whitespace-nowrap" style={{ color: colors.text }}>
+                    <div className="text-xs font-semibold" style={{ color: colors.text }}>
                       All Day
                     </div>
                   </div>
@@ -410,14 +413,14 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                                 padding: '6px 10px',
                               }}
                             >
-                              <div className="text-xs font-semibold text-primary truncate">
-                                {event.title}
-                              </div>
-                              {height > 40 && (
-                                <div className="text-xs text-tertiary mt-0.5">
+                              <div className="flex flex-col gap-1">
+                                <div className="text-xs font-semibold text-primary truncate">
+                                  {event.title}
+                                </div>
+                                <div className="text-xs font-semibold" style={{ color: colors.text }}>
                                   {format(eventStart, 'h:mm a')}
                                 </div>
-                              )}
+                              </div>
                             </div>
                           );
                         }
