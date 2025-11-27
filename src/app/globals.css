@@ -168,6 +168,25 @@ body {
   color: #cc0000 !important;
 }
 
+/* Exclude calendar from night mode - keep normal colors */
+.night-mode #calendar-container,
+.night-mode #calendar-container * {
+  --text-primary: #ffffff !important;
+  --text-secondary: #ebebf5 !important;
+  --text-tertiary: rgba(235, 235, 245, 0.6) !important;
+  --text-quaternary: rgba(235, 235, 245, 0.3) !important;
+
+  --accent-blue: #0a84ff !important;
+  --accent-teal: #64d2ff !important;
+  --accent-green: #30d158 !important;
+  --accent-yellow: #ffd60a !important;
+  --accent-orange: #ff9f0a !important;
+  --accent-red: #ff453a !important;
+  --accent-purple: #bf5af2 !important;
+
+  color: var(--text-primary) !important;
+}
+
 .night-mode svg,
 .night-mode svg *,
 .night-mode img {

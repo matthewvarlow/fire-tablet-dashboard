@@ -219,7 +219,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right: Calendar */}
-        <div className="flex flex-col h-full">
+        <div id="calendar-container" className="flex flex-col h-full">
           <Calendar data={calendarData} loading={calendarLoading} error={calendarError} />
         </div>
       </div>
