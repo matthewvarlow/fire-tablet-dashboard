@@ -326,7 +326,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         {/* All-Day Events - Fixed Header */}
         {allDayEvents.length > 0 && (
           <div className="mb-3 pb-3" style={{ borderBottom: '1px solid var(--divider)' }}>
-            <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {allDayEvents.map((event) => {
                 const colors = getEventColor(event);
                 return (
@@ -341,7 +341,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                     <div className="text-xs font-semibold text-primary truncate flex-1">
                       {event.title}
                     </div>
-                    <div className="text-xs font-medium" style={{ color: colors.text }}>
+                    <div className="text-xs font-medium whitespace-nowrap" style={{ color: colors.text }}>
                       All Day
                     </div>
                   </div>
