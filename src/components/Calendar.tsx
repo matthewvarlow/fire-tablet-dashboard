@@ -177,7 +177,15 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         // Don't scroll past the end
         scrollPosition = Math.min(scrollPosition, contentHeight - containerHeight);
       } else {
-        // Find the bottom position of the last upcoming event
+        // Find the first upcoming event
+        const firstUpcomingEvent = upcomingEvents[0];
+        const firstEventStart = parseISO(firstUpcomingEvent.start);
+        const firstEventHour = firstEventStart.getHours();
+        const firstEventMinute = firstEventStart.getMinutes();
+        const firstEventMinutesSinceMidnight = firstEventHour * 60 + firstEventMinute;
+        const firstEventPosition = firstEventMinutesSinceMidnight * 1.0;
+
+        // Find the last upcoming event
         const lastUpcomingEvent = upcomingEvents[upcomingEvents.length - 1];
         const lastEventEnd = parseISO(lastUpcomingEvent.end);
         const lastEventEndHour = lastEventEnd.getHours();
@@ -185,21 +193,29 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
         const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0;
 
-        // Try to center on current time
-        scrollPosition = Math.max(0, position - containerHeight / 2);
+        // If current time is more than 2 hours before first event, show 2 hours before first event
+        const twoHoursBeforeFirstEvent = firstEventPosition - (120 * 1.0); // 120 minutes = 2 hours
 
-        // Check if this would cut off the last upcoming event
-        const visibleBottom = scrollPosition + containerHeight;
+        if (position < twoHoursBeforeFirstEvent) {
+          // Current time is way before first event - scroll to show first event with 2hr padding
+          scrollPosition = Math.max(0, twoHoursBeforeFirstEvent);
+        } else {
+          // Normal case - try to center on current time
+          scrollPosition = Math.max(0, position - containerHeight / 2);
 
-        // If the last event end is cut off, adjust to show it fully
-        if (lastEventPosition > visibleBottom) {
-          // Prioritize showing the full last event
-          scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60); // +60px padding
+          // Check if this would cut off the last upcoming event
+          const visibleBottom = scrollPosition + containerHeight;
+
+          // If the last event end is cut off, adjust to show it fully
+          if (lastEventPosition > visibleBottom) {
+            // Prioritize showing the full last event
+            scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60); // +60px padding
+          }
+
+          // But don't scroll so far that we cut off the current time indicator
+          const minScrollToShowRedLine = Math.max(0, position - containerHeight + 100); // Keep red line at least 100px from bottom
+          scrollPosition = Math.min(scrollPosition, minScrollToShowRedLine);
         }
-
-        // But don't scroll so far that we cut off the current time indicator
-        const minScrollToShowRedLine = Math.max(0, position - containerHeight + 100); // Keep red line at least 100px from bottom
-        scrollPosition = Math.min(scrollPosition, minScrollToShowRedLine);
       }
 
       scheduleContainerRef.current.scrollTo({
