@@ -184,13 +184,11 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
     return isSameDay(eventStart, today) && !event.allDay;
   });
 
-  const todayAllDayEvents = data.events
-    .filter(event => {
-      // Handle both date strings (YYYY-MM-DD) and dateTime strings (ISO 8601)
-      const eventStart = new Date(event.start);
-      return isSameDay(eventStart, today) && event.allDay;
-    })
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const todayAllDayEvents = data.events.filter(event => {
+    // Handle both date strings (YYYY-MM-DD) and dateTime strings (ISO 8601)
+    const eventStart = new Date(event.start);
+    return isSameDay(eventStart, today) && event.allDay;
+  });
 
   // Get tomorrow's events - all day events + longest event per calendar
   const tomorrowEvents = data.events.filter(event => {
@@ -235,9 +233,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   // Get tomorrow's timed events for schedule view
   const tomorrowTimedEvents = tomorrowEvents.filter(event => !event.allDay);
-  const tomorrowAllDayEvents = tomorrowEvents
-    .filter(event => event.allDay)
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const tomorrowAllDayEvents = tomorrowEvents.filter(event => event.allDay);
 
   // Determine which events to show in schedule based on toggle
   const scheduleEvents = showTomorrow ? tomorrowTimedEvents : todayTimedEvents;
