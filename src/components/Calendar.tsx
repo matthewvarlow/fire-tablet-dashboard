@@ -193,15 +193,18 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
         const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0;
 
-        // If current time is more than 2 hours before first event, show 2 hours before first event
-        const twoHoursBeforeFirstEvent = firstEventPosition - (120 * 1.0); // 120 minutes = 2 hours
+        // Smart scroll: if there's empty space above first event, start from 2 hours before it
+        const twoHoursBeforeFirstEvent = Math.max(0, firstEventPosition - (120 * 1.0)); // 120 minutes = 2 hours
 
-        if (position < twoHoursBeforeFirstEvent) {
-          // Current time is way before first event - scroll to show first event with 2hr padding
-          scrollPosition = Math.max(0, twoHoursBeforeFirstEvent);
+        // Try to center on current time
+        let idealScrollPosition = Math.max(0, position - containerHeight / 2);
+
+        // If the ideal scroll would show too much empty space above the first event,
+        // instead scroll to 2 hours before first event
+        if (idealScrollPosition < twoHoursBeforeFirstEvent) {
+          scrollPosition = twoHoursBeforeFirstEvent;
         } else {
-          // Normal case - try to center on current time
-          scrollPosition = Math.max(0, position - containerHeight / 2);
+          scrollPosition = idealScrollPosition;
 
           // Check if this would cut off the last upcoming event
           const visibleBottom = scrollPosition + containerHeight;
