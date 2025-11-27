@@ -379,7 +379,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                     className="relative flex items-start"
                     style={{ height: `${hourHeight}px` }}
                   >
-                    <div className="w-16 text-right pr-4 flex-shrink-0">
+                    <div className="w-16 text-right pr-4 flex-shrink-0 -translate-y-2">
                       <span className="text-xs font-medium text-quaternary">
                         {format(new Date().setHours(hour, 0), 'h a')}
                       </span>
