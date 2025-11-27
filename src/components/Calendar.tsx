@@ -94,7 +94,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
       // Calculate position from start of day (midnight = hour 0)
       const minutesSinceMidnight = currentHour * 60 + currentMinute;
-      const position = minutesSinceMidnight * 1.0 + 8; // pixelsPerMinute = 1.0
+      const position = minutesSinceMidnight * 1.5 + 8; // pixelsPerMinute = 1.5
 
       const containerHeight = scheduleContainerRef.current.clientHeight;
       const contentHeight = scheduleContainerRef.current.scrollHeight;
@@ -120,7 +120,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         const lastEventEndHour = lastEventEnd.getHours();
         const lastEventEndMinute = lastEventEnd.getMinutes();
         const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
-        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0 + 8;
+        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.5 + 8;
 
         // Try to center on current time
         scrollPosition = Math.max(0, position - containerHeight / 2);
@@ -312,7 +312,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
     return DEFAULT_COLOR;
   };
 
-  const pixelsPerMinute = 1.0;
+  const pixelsPerMinute = 1.5;
   const hourHeight = 60 * pixelsPerMinute;
 
   return (
@@ -335,16 +335,16 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                 return (
                   <div
                     key={event.id}
-                    className="rounded-md px-2.5 py-1.5 flex flex-col gap-0.5"
+                    className="rounded-md px-2.5 py-1.5 flex items-center gap-2"
                     style={{
                       backgroundColor: colors.bg,
                       borderLeft: `3px solid ${colors.border}`,
                     }}
                   >
-                    <div className="text-xs font-semibold text-primary truncate">
+                    <div className="text-xs font-semibold text-primary truncate flex-1">
                       {event.title}
                     </div>
-                    <div className="text-xs font-semibold" style={{ color: colors.text }}>
+                    <div className="text-xs font-medium whitespace-nowrap" style={{ color: colors.text }}>
                       All Day
                     </div>
                   </div>
@@ -398,6 +398,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                           const top = startMinute * pixelsPerMinute;
                           const height = Math.max(duration * pixelsPerMinute - 2, 32);
                           const columnWidth = 100 / event.totalColumns;
+                          const isShortEvent = duration <= 15;
 
                           return (
                             <div
@@ -413,14 +414,25 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                                 padding: '6px 10px',
                               }}
                             >
-                              <div className="flex flex-col gap-1">
-                                <div className="text-xs font-semibold text-primary truncate">
-                                  {event.title}
+                              {isShortEvent ? (
+                                <div className="flex items-center gap-2">
+                                  <div className="text-xs font-semibold text-primary truncate flex-1">
+                                    {event.title}
+                                  </div>
+                                  <div className="text-xs font-semibold whitespace-nowrap" style={{ color: colors.text }}>
+                                    {format(eventStart, 'h:mm a')}
+                                  </div>
                                 </div>
-                                <div className="text-xs font-semibold" style={{ color: colors.text }}>
-                                  {format(eventStart, 'h:mm a')}
+                              ) : (
+                                <div className="flex flex-col gap-1">
+                                  <div className="text-xs font-semibold text-primary truncate">
+                                    {event.title}
+                                  </div>
+                                  <div className="text-xs font-semibold" style={{ color: colors.text }}>
+                                    {format(eventStart, 'h:mm a')}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
                           );
                         }
