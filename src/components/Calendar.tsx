@@ -60,7 +60,8 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   // Handle toggle between today and tomorrow
   const handleTomorrowClick = () => {
-    setShowTomorrow(!showTomorrow);
+    const newShowTomorrow = !showTomorrow;
+    setShowTomorrow(newShowTomorrow);
 
     // Clear existing timeout
     if (tomorrowTimeoutRef.current) {
@@ -68,10 +69,51 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
     }
 
     // If switching to tomorrow view, set timeout to revert back
-    if (!showTomorrow) {
+    if (newShowTomorrow) {
       tomorrowTimeoutRef.current = setTimeout(() => {
         setShowTomorrow(false);
       }, 30000); // Revert after 30 seconds
+
+      // Scroll to first event of tomorrow
+      setTimeout(() => {
+        if (scheduleContainerRef.current && data) {
+          const tomorrowDay = addDays(startOfDay(currentTime), 1);
+          const tomorrowDateStr = format(tomorrowDay, 'yyyy-MM-dd');
+
+          const tomorrowTimedEvts = data.events.filter(event => {
+            if (event.allDay) return false;
+            const eventStart = parseISO(event.start);
+            return isSameDay(eventStart, tomorrowDay);
+          });
+
+          if (tomorrowTimedEvts.length > 0) {
+            // Find the earliest event
+            const firstEvent = tomorrowTimedEvts.reduce((earliest, event) => {
+              return new Date(event.start).getTime() < new Date(earliest.start).getTime() ? event : earliest;
+            });
+
+            const eventStart = parseISO(firstEvent.start);
+            const eventHour = eventStart.getHours();
+            const eventMinute = eventStart.getMinutes();
+            const minutesSinceMidnight = eventHour * 60 + eventMinute;
+            const position = minutesSinceMidnight * 1.0; // pixelsPerMinute = 1.0
+
+            // Scroll to show first event with some padding above
+            const scrollPosition = Math.max(0, position - 60); // 60px padding above first event
+
+            scheduleContainerRef.current.scrollTo({
+              top: scrollPosition,
+              behavior: 'smooth'
+            });
+          } else {
+            // No events tomorrow, scroll to top
+            scheduleContainerRef.current.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        }
+      }, 100); // Small delay to ensure state has updated
     }
   };
 
@@ -460,6 +502,25 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                   </div>
                 );
               })}
+
+            {/* Final 12 AM marker at end of day */}
+            <div className="relative flex items-start" style={{ height: '1px' }}>
+              <div className="w-16 text-right pr-4 flex-shrink-0 flex items-center" style={{ height: '1px', transform: 'translateY(0)' }}>
+                <span className="text-xs font-medium text-quaternary">
+                  12 AM
+                </span>
+              </div>
+              <div className="flex-1 relative">
+                <div
+                  className="absolute top-0 w-full"
+                  style={{
+                    height: '1px',
+                    background: 'var(--divider)',
+                    opacity: 0.3
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Current Time Indicator - only show when viewing today */}
