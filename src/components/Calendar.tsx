@@ -92,9 +92,9 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
 
-      // Calculate position from start of day (midnight = hour 0), +2 to align with hour lines
+      // Calculate position from start of day (midnight = hour 0)
       const minutesSinceMidnight = currentHour * 60 + currentMinute;
-      const position = minutesSinceMidnight * 1.0 + 2; // pixelsPerMinute = 1.0
+      const position = minutesSinceMidnight * 1.0; // pixelsPerMinute = 1.0
 
       const containerHeight = scheduleContainerRef.current.clientHeight;
       const contentHeight = scheduleContainerRef.current.scrollHeight;
@@ -120,7 +120,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         const lastEventEndHour = lastEventEnd.getHours();
         const lastEventEndMinute = lastEventEnd.getMinutes();
         const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
-        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0 + 2;
+        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0;
 
         // Try to center on current time
         scrollPosition = Math.max(0, position - containerHeight / 2);
@@ -379,7 +379,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                     className="relative flex items-start"
                     style={{ height: `${hourHeight}px` }}
                   >
-                    <div className="w-16 text-right pr-4 pt-1 flex-shrink-0">
+                    <div className="w-16 text-right pr-4 flex-shrink-0">
                       <span className="text-xs font-medium text-quaternary">
                         {format(new Date().setHours(hour, 0), 'h a')}
                       </span>
@@ -387,7 +387,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
                     <div className="flex-1 relative">
                       <div
-                        className="absolute top-2 w-full"
+                        className="absolute top-0 w-full"
                         style={{
                           height: '1px',
                           background: 'var(--divider)',
@@ -405,8 +405,8 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
                           const duration = differenceInMinutes(eventEnd, eventStart);
                           const colors = getEventColor(event);
 
-                          const top = startMinute * pixelsPerMinute + 2; // +2 to align with hour line
-                          const height = Math.max(duration * pixelsPerMinute - 2, 32);
+                          const top = startMinute * pixelsPerMinute;
+                          const height = Math.max(duration * pixelsPerMinute, 32);
                           const columnWidth = 100 / event.totalColumns;
                           const isShortEvent = duration <= 30;
 
@@ -460,9 +460,9 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
 
-            // Calculate position from midnight (hour 0), +2 to align with hour lines
+            // Calculate position from midnight (hour 0)
             const minutesSinceMidnight = currentHour * 60 + currentMinute;
-            const position = minutesSinceMidnight * pixelsPerMinute + 2;
+            const position = minutesSinceMidnight * pixelsPerMinute;
 
             return (
               <div
