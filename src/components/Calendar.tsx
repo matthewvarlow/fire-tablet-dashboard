@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { format, addDays, parseISO, differenceInMinutes, isSameDay, startOfDay, isToday, isTomorrow } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
+
+const TIMEZONE = 'America/Toronto'; // EST/EDT
 
 interface CalendarEvent {
   id: string;
@@ -46,7 +49,8 @@ interface PositionedEvent extends CalendarEvent {
 }
 
 export default function Calendar({ data, loading, error }: CalendarProps) {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // Use EST timezone for all date operations
+  const [currentTime, setCurrentTime] = useState(() => toZonedTime(new Date(), TIMEZONE));
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showTomorrow, setShowTomorrow] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,7 +59,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   const savedTodayScrollPosition = useRef<number>(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    const timer = setInterval(() => setCurrentTime(toZonedTime(new Date(), TIMEZONE)), 60000);
     return () => clearInterval(timer);
   }, []);
 
