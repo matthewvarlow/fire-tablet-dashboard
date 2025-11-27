@@ -52,6 +52,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduleContainerRef = useRef<HTMLDivElement | null>(null);
   const tomorrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const savedTodayScrollPosition = useRef<number>(0);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -70,6 +71,11 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
     // If switching to tomorrow view, set timeout to revert back
     if (newShowTomorrow) {
+      // Save current scroll position for today
+      if (scheduleContainerRef.current) {
+        savedTodayScrollPosition.current = scheduleContainerRef.current.scrollTop;
+      }
+
       tomorrowTimeoutRef.current = setTimeout(() => {
         setShowTomorrow(false);
       }, 30000); // Revert after 30 seconds
@@ -99,7 +105,8 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
             const position = minutesSinceMidnight * 1.0; // pixelsPerMinute = 1.0
 
             // Scroll to show first event with some padding above
-            const scrollPosition = Math.max(0, position - 60); // 60px padding above first event
+            // Account for top padding in the schedule container
+            const scrollPosition = Math.max(0, position - 60);
 
             scheduleContainerRef.current.scrollTo({
               top: scrollPosition,
@@ -114,6 +121,16 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
           }
         }
       }, 100); // Small delay to ensure state has updated
+    } else {
+      // Switching back to today - restore saved scroll position
+      setTimeout(() => {
+        if (scheduleContainerRef.current) {
+          scheduleContainerRef.current.scrollTo({
+            top: savedTodayScrollPosition.current,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
     }
   };
 
@@ -374,6 +391,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
   const pixelsPerMinute = 1.0;
   const hourHeight = 60 * pixelsPerMinute;
+  const SCHEDULE_TOP_PADDING = 8; // pt-2 in pixels
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -420,7 +438,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
           className="relative flex-1 schedule-container"
           style={{ overflowY: 'auto' }}
         >
-          <div className="relative pr-2">
+          <div className="relative pr-2 pt-2">
             {hours.map((hour) => {
                 const isCurrentHour = currentTime.getHours() === hour;
                 return (
@@ -531,7 +549,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
             // Calculate position from midnight (hour 0)
             const minutesSinceMidnight = currentHour * 60 + currentMinute;
-            const position = minutesSinceMidnight * pixelsPerMinute;
+            const position = minutesSinceMidnight * pixelsPerMinute + SCHEDULE_TOP_PADDING;
 
             return (
               <div
