@@ -138,7 +138,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
     }
   };
 
-  // Auto-scroll to current time indicator (only when showing today)
+  // Auto-scroll to intelligently frame current and upcoming events
   useEffect(() => {
     if (!showTomorrow && !isUserScrolling && scheduleContainerRef.current && data) {
       const today = startOfDay(currentTime);
@@ -155,14 +155,14 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
 
-      // Calculate position from start of day (midnight = hour 0)
+      // Calculate current time position (pixelsPerMinute = 1.0)
       const minutesSinceMidnight = currentHour * 60 + currentMinute;
-      const position = minutesSinceMidnight * 1.0; // pixelsPerMinute = 1.0
+      const currentTimePosition = minutesSinceMidnight * 1.0;
 
       const containerHeight = scheduleContainerRef.current.clientHeight;
       const contentHeight = scheduleContainerRef.current.scrollHeight;
 
-      // Find upcoming and current events (not yet finished)
+      // Find upcoming events (not yet finished)
       const currentTimeMs = now.getTime();
       const upcomingEvents = todayEvents.filter(event => {
         const eventEnd = parseISO(event.end);
@@ -172,53 +172,44 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
       let scrollPosition: number;
 
       if (upcomingEvents.length === 0) {
-        // No more events - keep red line centered as time continues
-        scrollPosition = Math.max(0, position - containerHeight / 2);
-        // Don't scroll past the end
+        // EVENING CASE: No more events today
+        // Keep red line centered and let it scroll through rest of day
+        scrollPosition = Math.max(0, currentTimePosition - containerHeight / 2);
         scrollPosition = Math.min(scrollPosition, contentHeight - containerHeight);
       } else {
-        // Find the first upcoming event
+        // ACTIVE DAY CASE: Have upcoming events
+        // Goal: Maximize visibility of current time + upcoming events
+
         const firstUpcomingEvent = upcomingEvents[0];
         const firstEventStart = parseISO(firstUpcomingEvent.start);
-        const firstEventHour = firstEventStart.getHours();
-        const firstEventMinute = firstEventStart.getMinutes();
-        const firstEventMinutesSinceMidnight = firstEventHour * 60 + firstEventMinute;
-        const firstEventPosition = firstEventMinutesSinceMidnight * 1.0;
+        const firstEventMinutes = firstEventStart.getHours() * 60 + firstEventStart.getMinutes();
+        const firstEventPosition = firstEventMinutes * 1.0;
 
-        // Find the last upcoming event
         const lastUpcomingEvent = upcomingEvents[upcomingEvents.length - 1];
         const lastEventEnd = parseISO(lastUpcomingEvent.end);
-        const lastEventEndHour = lastEventEnd.getHours();
-        const lastEventEndMinute = lastEventEnd.getMinutes();
-        const lastEventEndMinutesSinceMidnight = lastEventEndHour * 60 + lastEventEndMinute;
-        const lastEventPosition = lastEventEndMinutesSinceMidnight * 1.0;
+        const lastEventMinutes = lastEventEnd.getHours() * 60 + lastEventEnd.getMinutes();
+        const lastEventPosition = lastEventMinutes * 1.0;
 
-        // Smart scroll: if there's empty space above first event, start from 2 hours before it
-        const twoHoursBeforeFirstEvent = Math.max(0, firstEventPosition - (120 * 1.0)); // 120 minutes = 2 hours
+        // Strategy: Start from 2 hours before first event (to avoid empty morning hours)
+        const earliestDesiredPosition = Math.max(0, firstEventPosition - 120);
 
-        // Try to center on current time
-        let idealScrollPosition = Math.max(0, position - containerHeight / 2);
+        // Calculate where centering on current time would scroll to
+        const centeredPosition = Math.max(0, currentTimePosition - containerHeight / 2);
 
-        // If the ideal scroll would show too much empty space above the first event,
-        // instead scroll to 2 hours before first event
-        if (idealScrollPosition < twoHoursBeforeFirstEvent) {
-          scrollPosition = twoHoursBeforeFirstEvent;
-        } else {
-          scrollPosition = idealScrollPosition;
+        // Use the later of: 2hrs before first event OR centered on current time
+        // This prevents showing empty hours while keeping current time visible
+        scrollPosition = Math.max(earliestDesiredPosition, centeredPosition);
 
-          // Check if this would cut off the last upcoming event
-          const visibleBottom = scrollPosition + containerHeight;
-
-          // If the last event end is cut off, adjust to show it fully
-          if (lastEventPosition > visibleBottom) {
-            // Prioritize showing the full last event
-            scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60); // +60px padding
-          }
-
-          // But don't scroll so far that we cut off the current time indicator
-          const minScrollToShowRedLine = Math.max(0, position - containerHeight + 100); // Keep red line at least 100px from bottom
-          scrollPosition = Math.min(scrollPosition, minScrollToShowRedLine);
+        // Ensure last upcoming event is visible
+        const visibleBottom = scrollPosition + containerHeight;
+        if (lastEventPosition > visibleBottom) {
+          // Adjust to show the last event with padding
+          scrollPosition = Math.max(0, lastEventPosition - containerHeight + 60);
         }
+
+        // Ensure current time line stays visible (at least 100px from bottom)
+        const maxScrollToKeepRedLineVisible = currentTimePosition - 100;
+        scrollPosition = Math.min(scrollPosition, maxScrollToKeepRedLineVisible);
       }
 
       scheduleContainerRef.current.scrollTo({
