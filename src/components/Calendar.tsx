@@ -601,7 +601,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
         <h3 className="text-xs font-semibold uppercase tracking-wider text-quaternary mb-5 ml-1">
           Tomorrow At A Glance {showTomorrow && '(Viewing Above)'}
         </h3>
-        <div className="grid grid-cols-2 gap-2.5" style={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
+        <div className="grid grid-cols-2 gap-2.5 content-start" style={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
           {tomorrowEventsToShow.length === 0 ? (
             <p className="text-sm text-tertiary col-span-2">No events scheduled for tomorrow</p>
           ) : (
@@ -612,7 +612,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
               return (
                 <div
                   key={event.id}
-                  className="p-3 rounded-xl transition-smooth"
+                  className="p-3 rounded-xl transition-smooth h-fit"
                   style={{
                     backgroundColor: colors.bg,
                     borderLeft: `3px solid ${colors.border}`,
