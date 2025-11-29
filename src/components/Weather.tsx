@@ -128,9 +128,9 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
         <div className="card card-elevated p-6">
           <div className="relative flex items-center justify-center h-full gap-8">
             {/* H/L in top right corner */}
-            <div className="absolute top-0 right-0 px-3 py-2 rounded-lg" style={{ border: '2px solid var(--accent-red)' }}>
-              <div className="text-lg font-medium text-primary">
-                {data.current.high}/{data.current.low}
+            <div className="absolute top-0 right-0">
+              <div className="text-xl text-tertiary">
+                {data.current.high}°/{data.current.low}°
               </div>
             </div>
 
@@ -154,7 +154,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
           <div className="flex items-center justify-center h-full">
             <div className="grid grid-cols-3 gap-x-10 gap-y-5">
               {[
-                { label: 'Precipitation', value: `${data.current.precipitationToday} cm` },
+                { label: 'Precip. Today', value: `${data.current.precipitationToday} cm` },
                 { label: 'Humidity', value: `${data.current.humidity}%` },
                 {
                   label: 'Wind',
