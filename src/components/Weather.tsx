@@ -139,10 +139,10 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
               <div className="text-8xl font-extralight text-primary" style={{ lineHeight: '0.9', letterSpacing: '-0.02em' }}>
                 {data.current.temp}°
               </div>
-              <div className="text-xl text-tertiary mt-2">
+              <div className="text-2xl font-medium text-secondary mt-3">
                 Feels Like: {data.current.feelsLike}°
               </div>
-              <div className="text-2xl font-medium text-secondary capitalize mt-3">
+              <div className="text-xl text-tertiary capitalize mt-2">
                 {data.current.description}
               </div>
             </div>
