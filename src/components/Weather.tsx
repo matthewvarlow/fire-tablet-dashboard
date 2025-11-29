@@ -139,11 +139,11 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
               <div className="text-8xl font-extralight text-primary" style={{ lineHeight: '0.9', letterSpacing: '-0.02em' }}>
                 {data.current.temp}°
               </div>
-              <div className="text-2xl font-medium text-secondary capitalize mt-3">
-                {data.current.description}
-              </div>
               <div className="text-xl text-tertiary mt-2">
                 Feels Like: {data.current.feelsLike}°
+              </div>
+              <div className="text-2xl font-medium text-secondary capitalize mt-3">
+                {data.current.description}
               </div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
           <div className="flex items-center justify-center h-full">
             <div className="grid grid-cols-3 gap-x-10 gap-y-5">
               {[
-                { label: 'Precip. Today', value: `${data.current.precipitationToday} cm` },
+                { label: 'Precip.', value: `${data.current.precipitationToday} cm` },
                 { label: 'Humidity', value: `${data.current.humidity}%` },
                 {
                   label: 'Wind',
