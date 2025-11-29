@@ -134,16 +134,21 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
               </div>
             </div>
 
-            <WeatherIcon iconCode={data.current.icon} weatherId={data.current.weatherId} size={140} />
+            {/* Left side: Icon and description */}
+            <div className="flex flex-col items-center gap-3">
+              <WeatherIcon iconCode={data.current.icon} weatherId={data.current.weatherId} size={140} />
+              <div className="text-xl text-tertiary capitalize">
+                {data.current.description}
+              </div>
+            </div>
+
+            {/* Right side: Temperature and feels like */}
             <div>
               <div className="text-8xl font-extralight text-primary" style={{ lineHeight: '0.9', letterSpacing: '-0.02em' }}>
                 {data.current.temp}°
               </div>
               <div className="text-2xl font-medium text-secondary mt-3">
                 Feels Like: {data.current.feelsLike}°
-              </div>
-              <div className="text-xl text-tertiary capitalize mt-2">
-                {data.current.description}
               </div>
             </div>
           </div>
