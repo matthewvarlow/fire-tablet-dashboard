@@ -126,7 +126,14 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
       <div className="grid grid-cols-2 gap-4" style={{ flexShrink: 0, height: '224px' }}>
         {/* Left: Current Condition */}
         <div className="card card-elevated p-6">
-          <div className="flex items-center justify-center h-full gap-8">
+          <div className="relative flex items-center justify-center h-full gap-8">
+            {/* H/L in top right corner */}
+            <div className="absolute top-0 right-0 px-3 py-2 rounded-lg" style={{ border: '2px solid var(--accent-red)' }}>
+              <div className="text-lg font-medium text-primary">
+                {data.current.high}/{data.current.low}
+              </div>
+            </div>
+
             <WeatherIcon iconCode={data.current.icon} weatherId={data.current.weatherId} size={140} />
             <div>
               <div className="text-8xl font-extralight text-primary" style={{ lineHeight: '0.9', letterSpacing: '-0.02em' }}>
@@ -136,7 +143,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
                 {data.current.description}
               </div>
               <div className="text-xl text-tertiary mt-2">
-                H: {data.current.high}° · L: {data.current.low}°
+                Feels Like: {data.current.feelsLike}°
               </div>
             </div>
           </div>
@@ -147,7 +154,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
           <div className="flex items-center justify-center h-full">
             <div className="grid grid-cols-3 gap-x-10 gap-y-5">
               {[
-                { label: 'Feels Like', value: `${data.current.feelsLike}°` },
+                { label: 'Precipitation', value: `${data.current.precipitationToday} cm` },
                 { label: 'Humidity', value: `${data.current.humidity}%` },
                 {
                   label: 'Wind',
