@@ -129,7 +129,8 @@ export async function GET() {
     const hourlyForecasts = hourly.slice(1, 7).map((item: any) => ({
       time: new Date(item.dt * 1000).toLocaleTimeString('en-US', {
         hour: 'numeric',
-        hour12: true
+        hour12: true,
+        timeZone: 'America/Toronto'
       }),
       temp: Math.round(item.temp),
       icon: item.weather[0].icon,
@@ -241,7 +242,8 @@ export async function GET() {
           time: new Date(nextSunEvent.time * 1000).toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true
+            hour12: true,
+            timeZone: 'America/Toronto'
           })
         },
         moonPhase: {
