@@ -127,11 +127,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
           </div>
 
           {/* Large day number */}
-          <div className="flex-1 flex items-center justify-center" style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(30px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(180%)'
-          }}>
+          <div className="flex-1 flex items-center justify-center">
             <div className="font-light text-primary" style={{
               fontSize: '10rem',
               lineHeight: '0.85',
