@@ -105,18 +105,39 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
 
   return (
     <div className="h-full flex flex-col gap-4">
-      {/* Clock Card */}
-      <div className="card card-elevated p-8" style={{ flexGrow: 1, flexShrink: 1 }}>
-        <div className="flex items-center justify-between h-full">
+      {/* Clock and Date Row */}
+      <div className="grid gap-4" style={{ flexGrow: 1, flexShrink: 1, gridTemplateColumns: '1fr auto' }}>
+        {/* Clock Card */}
+        <div className="card card-elevated p-8 flex items-center justify-center">
           <div className="font-normal tracking-tight text-primary" style={{ fontSize: '11rem', lineHeight: '0.85', letterSpacing: '-0.02em' }}>
             {format(currentTime, 'h:mm')}
           </div>
-          <div className="flex flex-col items-end justify-center">
-            <div className="text-6xl font-light text-primary" style={{ letterSpacing: '-0.01em' }}>
+        </div>
+
+        {/* Calendar-Style Date Card - Square */}
+        <div className="card-elevated overflow-hidden flex flex-col" style={{ aspectRatio: '1/1', height: '100%', borderRadius: '20px' }}>
+          {/* Day of week header */}
+          <div className="text-center py-6" style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <div className="text-4xl font-semibold text-primary uppercase tracking-wide">
               {format(currentTime, 'EEEE')}
             </div>
-            <div className="text-4xl font-light text-tertiary mt-2">
-              {format(currentTime, 'MMMM d, yyyy')}
+          </div>
+
+          {/* Large day number */}
+          <div className="flex-1 flex items-center justify-center" style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            backdropFilter: 'blur(30px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(30px) saturate(180%)'
+          }}>
+            <div className="font-light text-primary" style={{
+              fontSize: '10rem',
+              lineHeight: '0.85',
+              letterSpacing: '-0.02em'
+            }}>
+              {format(currentTime, 'd')}
             </div>
           </div>
         </div>
