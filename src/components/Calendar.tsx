@@ -417,7 +417,7 @@ export default function Calendar({ data, loading, error }: CalendarProps) {
 
         {/* All-Day Events - Fixed Header */}
         {allDayEvents.length > 0 && (
-          <div className="mb-3 pb-3" style={{ borderBottom: '1px solid var(--divider)' }}>
+          <div id="all-day-separator" className="mb-3 pb-3" style={{ borderBottom: '1px solid var(--divider)' }}>
             <div
               className="grid gap-1.5"
               style={{ gridTemplateColumns: `repeat(${Math.min(allDayEvents.length, 3)}, 1fr)` }}
