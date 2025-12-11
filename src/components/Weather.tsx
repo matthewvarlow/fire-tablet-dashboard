@@ -117,7 +117,7 @@ export default function Weather({ data, loading, error, lastRefreshed }: Weather
         {/* Calendar-Style Date Card - Square */}
         <div className="card-elevated overflow-hidden flex flex-col" style={{ aspectRatio: '1/1', height: '100%', borderRadius: '20px' }}>
           {/* Day of week header */}
-          <div className="text-center py-6" style={{
+          <div id="day-of-week-header" className="text-center py-6" style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
