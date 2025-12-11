@@ -73,6 +73,7 @@ export default function Dashboard() {
   const [calendarError, setCalendarError] = useState<string | null>(null);
   const [weatherLastRefreshed, setWeatherLastRefreshed] = useState<Date | null>(null);
   const [isNightMode, setIsNightMode] = useState(false);
+  const [isBrightMode, setIsBrightMode] = useState(false);
 
   const fetchWeather = async () => {
     try {
@@ -205,8 +206,40 @@ export default function Dashboard() {
     return scheduleNextCalendarRefresh();
   }, []);
 
+  // Handle tap to brighten in night mode
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const handleTap = () => {
+      if (isNightMode) {
+        setIsBrightMode(true);
+
+        // Clear existing timeout
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+
+        // Revert to dim mode after 10 seconds
+        timeoutId = setTimeout(() => {
+          setIsBrightMode(false);
+        }, 10000);
+      }
+    };
+
+    document.addEventListener('click', handleTap);
+    document.addEventListener('touchstart', handleTap);
+
+    return () => {
+      document.removeEventListener('click', handleTap);
+      document.removeEventListener('touchstart', handleTap);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isNightMode]);
+
   return (
-    <div id="display-container" className={`p-5 ${isNightMode ? 'night-mode' : ''}`}>
+    <div id="display-container" className={`p-5 ${isNightMode ? (isBrightMode ? 'night-mode-bright' : 'night-mode') : ''}`}>
       <div className="grid grid-cols-[1fr_420px] h-full gap-5">
         {/* Left: Weather */}
         <div className="flex flex-col h-full">
