@@ -147,30 +147,8 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* Night Mode (after 11 PM) - Deep red theme for night vision */
+/* Night Mode (after 11 PM) - Default brighter state */
 .night-mode {
-  --text-primary: #440000;
-  --text-secondary: #550000;
-  --text-tertiary: rgba(68, 0, 0, 0.7);
-  --accent-blue: #440000;
-  --accent-teal: #440000;
-  --accent-green: #440000;
-  --accent-yellow: #440000;
-  --accent-orange: #440000;
-  --accent-purple: #440000;
-
-  /* Pitch black backgrounds */
-  --bg-primary: #000000;
-  --bg-card: rgba(0, 0, 0, 0.95);
-  --bg-card-elevated: rgba(0, 0, 0, 0.98);
-}
-
-.night-mode * {
-  color: #440000 !important;
-}
-
-/* Night Mode Bright - Temporary brightened state when tapped (original night mode before extreme dimming) */
-.night-mode-bright {
   --text-primary: #cc0000;
   --text-secondary: #dd0000;
   --text-tertiary: rgba(204, 0, 0, 0.7);
@@ -186,71 +164,8 @@ body {
   --bg-card-elevated: rgba(28, 28, 30, 0.4);
 }
 
-.night-mode-bright * {
+.night-mode * {
   color: #cc0000 !important;
-}
-
-/* Exclude calendar from bright mode - keep normal colors */
-.night-mode-bright #calendar-container * {
-  color: revert !important;
-}
-
-.night-mode-bright #calendar-container {
-  --text-primary: #ffffff;
-  --text-secondary: #ebebf5;
-  --text-tertiary: rgba(235, 235, 245, 0.6);
-  --text-quaternary: rgba(235, 235, 245, 0.3);
-
-  --accent-blue: #0a84ff;
-  --accent-teal: #64d2ff;
-  --accent-green: #30d158;
-  --accent-yellow: #ffd60a;
-  --accent-orange: #ff9f0a;
-  --accent-red: #ff453a;
-  --accent-purple: #bf5af2;
-}
-
-.night-mode-bright svg,
-.night-mode-bright svg *,
-.night-mode-bright img {
-  fill: #cc0000 !important;
-  stroke: #cc0000 !important;
-  filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(2deg) brightness(95%) contrast(118%) !important;
-}
-
-.night-mode-bright path,
-.night-mode-bright circle,
-.night-mode-bright rect,
-.night-mode-bright polygon,
-.night-mode-bright polyline,
-.night-mode-bright line {
-  fill: #cc0000 !important;
-  stroke: #cc0000 !important;
-}
-
-/* Add dimming overlay to entire display */
-.night-mode #display-container::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.95);
-  pointer-events: none;
-  z-index: 9999;
-}
-
-/* Darken day of week header to match other card backgrounds */
-.night-mode #day-of-week-header {
-  background: rgba(0, 0, 0, 0.95) !important;
-}
-
-/* Maintain card borders for structure visibility */
-.night-mode .card,
-.night-mode .card-elevated {
-  background: rgba(0, 0, 0, 0.95) !important;
-  border: 1px solid rgba(68, 0, 0, 0.3) !important;
 }
 
 /* Exclude calendar from night mode - keep normal colors */
@@ -273,39 +188,12 @@ body {
   --accent-purple: #bf5af2;
 }
 
-/* Remove bright borders from calendar events in night mode */
-.night-mode #calendar-container .rounded-md,
-.night-mode #calendar-container .rounded-lg,
-.night-mode #calendar-container .rounded-xl {
-  border-left: none !important;
-  background: rgba(0, 0, 0, 0.8) !important;
-}
-
-/* Deepen the current time indicator line to match text red */
-.night-mode #calendar-container {
-  --accent-red: #440000;
-}
-
-/* Dim the all-day event separator to match other calendar lines */
-.night-mode #all-day-separator {
-  border-bottom: 1px solid rgba(68, 0, 0, 0.2) !important;
-}
-
-/* Darken scrollbar to match calendar line colors */
-.night-mode ::-webkit-scrollbar-thumb {
-  background: rgba(68, 0, 0, 0.2) !important;
-}
-
-.night-mode ::-webkit-scrollbar-thumb:hover {
-  background: rgba(68, 0, 0, 0.3) !important;
-}
-
 .night-mode svg,
 .night-mode svg *,
 .night-mode img {
-  fill: #440000 !important;
-  stroke: #440000 !important;
-  filter: invert(5%) sepia(99%) saturate(7404%) hue-rotate(2deg) brightness(40%) contrast(118%) !important;
+  fill: #cc0000 !important;
+  stroke: #cc0000 !important;
+  filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(2deg) brightness(95%) contrast(118%) !important;
 }
 
 .night-mode path,
@@ -314,6 +202,113 @@ body {
 .night-mode polygon,
 .night-mode polyline,
 .night-mode line {
+  fill: #cc0000 !important;
+  stroke: #cc0000 !important;
+}
+
+/* Night Mode Dark - Ultra-dim state for bedtime (toggled by tapping) */
+.night-mode-dark {
+  --text-primary: #440000;
+  --text-secondary: #550000;
+  --text-tertiary: rgba(68, 0, 0, 0.7);
+  --accent-blue: #440000;
+  --accent-teal: #440000;
+  --accent-green: #440000;
+  --accent-yellow: #440000;
+  --accent-orange: #440000;
+  --accent-purple: #440000;
+
+  /* Pitch black backgrounds */
+  --bg-primary: #000000;
+  --bg-card: rgba(0, 0, 0, 0.95);
+  --bg-card-elevated: rgba(0, 0, 0, 0.98);
+}
+
+.night-mode-dark * {
+  color: #440000 !important;
+}
+
+/* Add ultra-dimming overlay for dark mode */
+.night-mode-dark #display-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Darken day of week header in dark mode */
+.night-mode-dark #day-of-week-header {
+  background: rgba(0, 0, 0, 0.95) !important;
+}
+
+/* Pitch black card backgrounds in dark mode */
+.night-mode-dark .card,
+.night-mode-dark .card-elevated {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(68, 0, 0, 0.3) !important;
+}
+
+/* Exclude calendar from dark mode - keep normal colors */
+.night-mode-dark #calendar-container * {
+  color: revert !important;
+}
+
+.night-mode-dark #calendar-container {
+  --text-primary: #ffffff;
+  --text-secondary: #ebebf5;
+  --text-tertiary: rgba(235, 235, 245, 0.6);
+  --text-quaternary: rgba(235, 235, 245, 0.3);
+
+  --accent-blue: #0a84ff;
+  --accent-teal: #64d2ff;
+  --accent-green: #30d158;
+  --accent-yellow: #ffd60a;
+  --accent-orange: #ff9f0a;
+  --accent-red: #440000;
+  --accent-purple: #bf5af2;
+}
+
+/* Remove bright borders from calendar events in dark mode */
+.night-mode-dark #calendar-container .rounded-md,
+.night-mode-dark #calendar-container .rounded-lg,
+.night-mode-dark #calendar-container .rounded-xl {
+  border-left: none !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Dim the all-day event separator in dark mode */
+.night-mode-dark #all-day-separator {
+  border-bottom: 1px solid rgba(68, 0, 0, 0.2) !important;
+}
+
+/* Darken scrollbar in dark mode */
+.night-mode-dark ::-webkit-scrollbar-thumb {
+  background: rgba(68, 0, 0, 0.2) !important;
+}
+
+.night-mode-dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(68, 0, 0, 0.3) !important;
+}
+
+.night-mode-dark svg,
+.night-mode-dark svg *,
+.night-mode-dark img {
+  fill: #440000 !important;
+  stroke: #440000 !important;
+  filter: invert(5%) sepia(99%) saturate(7404%) hue-rotate(2deg) brightness(40%) contrast(118%) !important;
+}
+
+.night-mode-dark path,
+.night-mode-dark circle,
+.night-mode-dark rect,
+.night-mode-dark polygon,
+.night-mode-dark polyline,
+.night-mode-dark line {
   fill: #440000 !important;
   stroke: #440000 !important;
 }
