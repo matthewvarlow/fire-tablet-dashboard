@@ -141,6 +141,12 @@ export default function Dashboard() {
 
       // Night mode: 11 PM to sunrise
       const isNight = currentTimeMinutes >= nightStartMinutes || currentTimeMinutes < sunriseTimeMinutes;
+
+      // Reset to default bright mode when night mode activates
+      if (isNight && !isNightMode) {
+        setIsDarkMode(false);
+      }
+
       setIsNightMode(isNight);
     };
 
