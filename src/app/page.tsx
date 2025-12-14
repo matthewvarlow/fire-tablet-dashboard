@@ -72,8 +72,9 @@ export default function Dashboard() {
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [calendarError, setCalendarError] = useState<string | null>(null);
   const [weatherLastRefreshed, setWeatherLastRefreshed] = useState<Date | null>(null);
-  const [isNightMode, setIsNightMode] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // NIGHT MODE DISABLED - Using Home Assistant automation to control screen instead
+  // const [isNightMode, setIsNightMode] = useState(false);
+  // const [isDarkMode, setIsDarkMode] = useState(false);
 
   const fetchWeather = async () => {
     try {
@@ -112,52 +113,53 @@ export default function Dashboard() {
     }
   };
 
+  // NIGHT MODE DISABLED - Using Home Assistant automation to control screen instead
   // Check time and update night mode (11 PM to sunrise)
-  useEffect(() => {
-    const checkNightMode = () => {
-      const now = new Date();
-      const hour = now.getHours();
-      const minutes = now.getMinutes();
-      const currentTimeMinutes = hour * 60 + minutes;
+  // useEffect(() => {
+  //   const checkNightMode = () => {
+  //     const now = new Date();
+  //     const hour = now.getHours();
+  //     const minutes = now.getMinutes();
+  //     const currentTimeMinutes = hour * 60 + minutes;
 
-      // Get sunrise time from weather data if available
-      let sunriseHour = 7; // Default fallback to 7 AM
-      let sunriseMinutes = 0;
+  //     // Get sunrise time from weather data if available
+  //     let sunriseHour = 7; // Default fallback to 7 AM
+  //     let sunriseMinutes = 0;
 
-      if (weatherData?.current?.nextSunEvent?.type === 'sunrise') {
-        // Parse sunrise time (e.g., "7:30 AM")
-        const sunriseStr = weatherData.current.nextSunEvent.time;
-        const match = sunriseStr.match(/(\d+):(\d+)\s*(AM|PM)/);
-        if (match) {
-          sunriseHour = parseInt(match[1]);
-          sunriseMinutes = parseInt(match[2]);
-          if (match[3] === 'PM' && sunriseHour !== 12) sunriseHour += 12;
-          if (match[3] === 'AM' && sunriseHour === 12) sunriseHour = 0;
-        }
-      }
+  //     if (weatherData?.current?.nextSunEvent?.type === 'sunrise') {
+  //       // Parse sunrise time (e.g., "7:30 AM")
+  //       const sunriseStr = weatherData.current.nextSunEvent.time;
+  //       const match = sunriseStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+  //       if (match) {
+  //         sunriseHour = parseInt(match[1]);
+  //         sunriseMinutes = parseInt(match[2]);
+  //         if (match[3] === 'PM' && sunriseHour !== 12) sunriseHour += 12;
+  //         if (match[3] === 'AM' && sunriseHour === 12) sunriseHour = 0;
+  //       }
+  //     }
 
-      const sunriseTimeMinutes = sunriseHour * 60 + sunriseMinutes;
-      const nightStartMinutes = 23 * 60; // 11 PM
+  //     const sunriseTimeMinutes = sunriseHour * 60 + sunriseMinutes;
+  //     const nightStartMinutes = 23 * 60; // 11 PM
 
-      // Night mode: 11 PM to sunrise
-      const isNight = currentTimeMinutes >= nightStartMinutes || currentTimeMinutes < sunriseTimeMinutes;
+  //     // Night mode: 11 PM to sunrise
+  //     const isNight = currentTimeMinutes >= nightStartMinutes || currentTimeMinutes < sunriseTimeMinutes;
 
-      // Reset to default bright mode when night mode activates
-      if (isNight && !isNightMode) {
-        setIsDarkMode(false);
-      }
+  //     // Reset to default bright mode when night mode activates
+  //     if (isNight && !isNightMode) {
+  //       setIsDarkMode(false);
+  //     }
 
-      setIsNightMode(isNight);
-    };
+  //     setIsNightMode(isNight);
+  //   };
 
-    // Check immediately
-    checkNightMode();
+  //   // Check immediately
+  //   checkNightMode();
 
-    // Check every minute
-    const interval = setInterval(checkNightMode, 60000);
+  //   // Check every minute
+  //   const interval = setInterval(checkNightMode, 60000);
 
-    return () => clearInterval(interval);
-  }, [weatherData]);
+  //   return () => clearInterval(interval);
+  // }, [weatherData]);
 
   useEffect(() => {
     fetchWeather();
@@ -212,25 +214,27 @@ export default function Dashboard() {
     return scheduleNextCalendarRefresh();
   }, []);
 
+  // NIGHT MODE DISABLED - Using Home Assistant automation to control screen instead
   // Handle tap to toggle between bright and dark night modes
-  useEffect(() => {
-    const handleTap = () => {
-      if (isNightMode) {
-        setIsDarkMode(prev => !prev);
-      }
-    };
+  // useEffect(() => {
+  //   const handleTap = () => {
+  //     if (isNightMode) {
+  //       setIsDarkMode(prev => !prev);
+  //     }
+  //   };
 
-    document.addEventListener('click', handleTap);
-    document.addEventListener('touchstart', handleTap);
+  //   document.addEventListener('click', handleTap);
+  //   document.addEventListener('touchstart', handleTap);
 
-    return () => {
-      document.removeEventListener('click', handleTap);
-      document.removeEventListener('touchstart', handleTap);
-    };
-  }, [isNightMode]);
+  //   return () => {
+  //     document.removeEventListener('click', handleTap);
+  //     document.removeEventListener('touchstart', handleTap);
+  //   };
+  // }, [isNightMode]);
 
   return (
-    <div id="display-container" className={`p-5 ${isNightMode ? (isDarkMode ? 'night-mode-dark' : 'night-mode') : ''}`}>
+    <div id="display-container" className="p-5">
+      {/* NIGHT MODE DISABLED - className was: className={`p-5 ${isNightMode ? (isDarkMode ? 'night-mode-dark' : 'night-mode') : ''}`} */}
       <div className="grid grid-cols-[1fr_420px] h-full gap-5">
         {/* Left: Weather */}
         <div className="flex flex-col h-full">
